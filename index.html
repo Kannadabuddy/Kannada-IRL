@@ -59,7 +59,7 @@ button:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
 .share-url{margin-top:12px;font-size:13.5px;color:var(--soft);word-break:break-all;background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:10px 12px 8px;user-select:all}
 .install{margin-top:14px;font-size:14px;line-height:1.55;color:var(--soft)}
 .install b{color:var(--ink)}
-@media (max-width:400px){.top h1 small{display:none}}
+@media (max-width:400px){.top h1 small{display:none}.top h1{font-size:17px}.streak,.xp{padding:5px 8px;font-size:14px}}
 
 /* level switch */
 .levels{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border:1px solid var(--line);
@@ -272,7 +272,8 @@ button:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
 .ucard .ub i{display:block;height:100%;background:var(--leaf);width:0;transition:width 1s .2s cubic-bezier(.2,.8,.2,1)}
 .ucard .tag{position:absolute;top:10px;right:12px;font-size:11.5px;font-weight:700;padding:3px 8px 1px;border-radius:99px;background:var(--midbg);color:var(--ink)}
 .ucard.done .tag{background:var(--okbg);color:var(--leaf)}
-.ucard>div:last-child{min-width:0;flex:1}
+.ucard>div:nth-child(2){min-width:0;flex:1 1 auto;overflow:hidden}
+.ucard .ut{padding-right:84px}
 .reveal-up{opacity:0;transform:translateY(18px);transition:opacity .5s,transform .5s cubic-bezier(.2,.8,.2,1)}
 .reveal-up.in{opacity:1;transform:none}
 /* card content entrance */
@@ -296,27 +297,151 @@ button:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
 .upnext .go2{margin-left:auto;font-size:22px;color:var(--leaf)}
 @keyframes slidein{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
 .daily{opacity:1}
+
+/* ===== full-screen pages ===== */
+html{scroll-snap-type:y mandatory;scroll-behavior:smooth}
+html,body{height:100%}
+.wrap{padding:12px 16px 24px}
+.pg{min-height:100vh;min-height:100svh;scroll-snap-align:start;position:relative;display:flex;flex-direction:column}
+.pg-path{scroll-snap-align:start}
+.pg>.wrap{width:100%;max-width:560px;margin-left:auto;margin-right:auto}
+body{overflow-x:hidden}
+.pgtitle{display:flex;align-items:baseline;gap:10px;padding:6px 2px 10px}
+.pgtitle h2{font-size:24px;font-weight:800}
+.pgtitle span{font-size:13.5px;color:var(--soft);margin-left:auto;text-align:right}
+.nextpg{margin:auto auto calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;font-size:13.5px;font-weight:600;color:var(--soft)}
+.nextpg span{font-size:22px;line-height:1;animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateY(6px)}}
+/* home */
+.pg-home{background:radial-gradient(120% 60% at 50% 0%,var(--auto) 0%,var(--bg) 60%)}
+.hero{margin-top:18px}
+.hello{font-size:20px;font-weight:700;color:var(--leaf)}
+.hero h2{font-size:30px;font-weight:800;line-height:1.15;margin-top:4px}
+.herostats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
+.hs{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 8px 9px;text-align:center}
+.hs b{display:block;font-size:24px;font-weight:800}
+.hs span{font-size:12.5px;color:var(--soft)}
+.cta{margin-top:16px;width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:var(--ink);color:var(--bg);border-radius:20px;padding:16px 18px 14px;
+  box-shadow:0 12px 30px -18px rgba(30,45,20,.8);animation:breathe 3s ease-in-out infinite}
+.cta small{display:block;font-size:12.5px;opacity:.75;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.cta b{font-size:19px;font-weight:800}
+.cta i{margin-left:auto;font-style:normal;font-size:28px}
+@keyframes breathe{50%{transform:scale(1.015)}}
+.hero .fact{margin-top:16px}
+.tip{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px 12px;font-size:14.5px;line-height:1.55;color:var(--soft)}
+.tip b{display:block;color:var(--ink);font-size:15px;margin-bottom:2px}
+/* practice page: card fills the space, dock sits at the bottom of the page */
+.pg-learn{height:100vh;height:100svh;overflow:hidden}
+.learnwrap{flex:1;display:flex;flex-direction:column;min-height:0;padding-bottom:0;width:100%}
+.learnwrap .stage{flex:1;min-height:0;display:flex}
+.learnwrap .card{flex:1;min-height:0;overflow:auto}
+.pg-learn .dock{position:relative;left:auto;right:auto;bottom:auto;flex:0 0 auto}
+.pg-learn .result{position:absolute;left:8px;right:8px;bottom:var(--dockh,150px);z-index:6;max-height:62%;overflow:auto;margin:0;
+  box-shadow:0 -12px 40px -16px rgba(30,45,20,.45);border-radius:22px}
+.pg-learn .result.show{animation:sheetup .38s cubic-bezier(.2,.9,.3,1)}
+@keyframes sheetup{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.rclose{position:sticky;top:0;float:right;width:32px;height:32px;border-radius:50%;background:var(--bg);border:1px solid var(--line);font-size:14px;margin:-4px -4px 0 6px;z-index:2}
+.toast{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
+/* page dots */
+.dots{position:fixed;right:8px;top:50%;transform:translateY(-50%);z-index:8;display:flex;flex-direction:column;gap:9px}
+.dots button{width:9px;height:9px;border-radius:50%;background:rgba(31,42,27,.22);transition:height .25s,background .25s;padding:0}
+.dots button.on{height:22px;border-radius:5px;background:var(--leaf)}
+@media (max-height:640px){.card{padding:14px 16px 16px}.kn-text{font-size:clamp(28px,9vw,40px);padding-top:10px}.levels button{padding:6px 2px 5px}}
+
+/* ===== app-style interactions ===== */
+button{transition:transform .12s ease}
+button:active{transform:scale(.96)}
+.top{gap:6px}.top h1{min-width:0;flex:1 1 auto;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.top .streak{margin-left:0}
+.top>*:not(h1){flex:0 0 auto}
+.xp{display:flex;align-items:center;gap:3px;font-weight:800;font-size:15px;padding:6px 10px;border-radius:99px;background:var(--surface);border:1px solid var(--line)}
+.gear{width:38px;height:38px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line)}
+.float{position:fixed;z-index:40;pointer-events:none;font-weight:800;font-size:22px;color:var(--leaf);text-shadow:0 2px 0 var(--surface);animation:floatup 1.1s ease-out forwards}
+@keyframes floatup{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}20%{opacity:1;transform:translate(-50%,0) scale(1.1)}100%{opacity:0;transform:translate(-50%,-70px) scale(1)}}
+.combo{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:3;background:var(--ink);color:var(--bg);font-weight:800;font-size:13px;padding:5px 12px 3px;border-radius:99px;animation:pop2 .4s cubic-bezier(.2,1.6,.4,1)}
+.heart{position:absolute;left:50%;top:45%;font-size:90px;transform:translate(-50%,-50%);pointer-events:none;animation:heartpop .9s ease-out forwards;z-index:4}
+@keyframes heartpop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}60%{transform:translate(-50%,-50%) scale(.95)}100%{opacity:0;transform:translate(-50%,-80%) scale(1)}}
+.favbtn{white-space:nowrap;font-size:16px;line-height:1;padding:3px 6px 1px;border-radius:99px}
+.favbtn.on{color:#C2553F}
+.savedlist{list-style:none;margin-top:8px}
+.savedlist li{display:flex;align-items:center;gap:10px;padding:10px 2px 8px;border-bottom:1px solid var(--line)}
+.savedlist li b{font-size:17px;display:block}
+.savedlist li small{color:var(--soft);font-size:13px}
+.savedlist li button{margin-left:auto;width:38px;height:38px;border-radius:50%;background:var(--auto);flex:0 0 auto}
+.streak.met{animation:flame 1.8s ease-in-out infinite}
+@keyframes flame{50%{box-shadow:0 0 0 6px rgba(214,203,96,.35)}}
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:14px 2px 12px;border-bottom:1px solid var(--line);font-weight:600;font-size:16px}
+.switch{width:50px;height:30px;border-radius:99px;background:var(--line);position:relative;transition:background .2s}
+.switch:after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s}
+.switch.on{background:var(--leaf)}.switch.on:after{left:23px}
+.danger{color:var(--flag);font-weight:700}
+/* onboarding */
+.onb{position:fixed;inset:0;z-index:45;overflow:hidden;width:100%;background:var(--bg);display:flex;flex-direction:column}
+.onb-track{flex:1 1 auto;min-height:0;min-width:0;width:100%;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none}
+.onb-track::-webkit-scrollbar{display:none}
+.onb-slide{flex:0 0 100%;width:100%;min-width:0;box-sizing:border-box;scroll-snap-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:24px 28px}
+.onb-slide .big{font-size:84px;line-height:1;animation:bob 2.4s ease-in-out infinite}
+.onb-slide h2{font-size:28px;font-weight:800;margin-top:18px;line-height:1.15}
+.onb-slide p{font-size:16px;color:var(--soft);margin-top:8px;max-width:340px}
+.onb-foot{padding:12px 20px calc(22px + env(safe-area-inset-bottom,0px));max-width:560px;width:100%;margin:0 auto}
+.onb-dots{display:flex;justify-content:center;gap:7px;margin-bottom:14px}
+.onb-dots i{width:8px;height:8px;border-radius:4px;background:var(--line);transition:width .25s,background .25s}
+.onb-dots i.on{width:22px;background:var(--leaf)}
+.onb .goals{width:100%;max-width:340px}
+.onb .go{width:100%;padding:15px 10px 13px;border-radius:16px;background:var(--ink);color:var(--bg);font-weight:700;font-size:16.5px}
+
+.ic{display:inline-block;vertical-align:-3px;flex:0 0 auto}
+.ucard .badge svg.ic{position:static;inset:auto;transform:none}
+.icirc{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;margin:6px auto 0;background:var(--auto);color:var(--leaf)}
+.onb-slide .icirc{width:120px;height:120px;animation:bob 3s ease-in-out infinite}
+.verdict .emo{width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;vertical-align:middle;margin:-4px 8px 0 0;background:var(--okbg);color:var(--leaf)}
+.verdict .emo.mid{background:var(--midbg);color:var(--amber)}.verdict .emo.low{background:var(--nobg);color:var(--flag)}
+.heart{font-size:0;color:#C2553F}
+.favbtn{display:grid;place-items:center;color:var(--auto-ink)}
+.favbtn.on{color:#C2553F}
+.streak .ic{color:#C9772E}
+.combo .ic{vertical-align:-2px}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.ucard,.reveal-up{opacity:1;transform:none}}
 </style>
 </head>
 <body>
 <div class="splash" id="splash" aria-hidden="true"><div><div class="logo">ಕ</div><h2>Kannaad IRL</h2><p>Kannada for real life</p></div></div>
 
-<div class="wrap">
+<main class="pages" id="pages">
+<!-- PAGE 1: HOME -->
+<section class="pg pg-home" id="pgHome" data-name="Home">
+  <div class="wrap">
   <header class="top">
     <div class="logo" aria-hidden="true">ಕ</div>
     <h1>Kannaad IRL<small id="sub">Listen. Repeat. Get understood.</small></h1>
-    <button class="streak" id="streak" aria-label="Today's target and streak"><svg width="22" height="22"><circle cx="11" cy="11" r="8.5" fill="none" stroke="var(--line)" stroke-width="3.5"/><circle id="dayArc" cx="11" cy="11" r="8.5" fill="none" stroke="var(--leaf)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="53.4" stroke-dashoffset="53.4"/></svg>🔥 <span id="streakN">0</span></button>
+    <button class="streak" id="streak" aria-label="Today's target and streak"><svg width="22" height="22"><circle cx="11" cy="11" r="8.5" fill="none" stroke="var(--line)" stroke-width="3.5"/><circle id="dayArc" cx="11" cy="11" r="8.5" fill="none" stroke="var(--leaf)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="53.4" stroke-dashoffset="53.4"/></svg><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="color:#C9772E"><path d="M12 3c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-1.6.7-2.7 1.6-3.6.2 1.4 1 2.1 1.9 2.1-.6-2.6-.2-4.9.5-7z"/></svg> <span id="streakN">0</span></button>
+    <button class="gear" id="gearBtn" aria-label="Settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
     <button class="studio-btn" id="openStudio" hidden style="display:none!important">Studio</button>
     <button class="share-btn" id="shareBtn" aria-label="Share Kannaad IRL"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m7 8 5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button>
   </header>
+  <div class="hero reveal-up">
+    <p class="hello" id="hello">ನಮಸ್ಕಾರ!</p>
+    <h2 id="heroTitle">Ready to speak some Kannada?</h2>
+    <div class="herostats">
+      <button class="hs" id="xpPill"><b id="xpN">0</b><span>XP earned</span></button>
+      <div class="hs"><b id="hsPh">0/5</b><span>phrases today</span></div>
+      <div class="hs"><b id="hsW">0/3</b><span>new words</span></div>
+    </div>
+    <button class="cta" id="continueBtn"><span><small id="contSub">Continue</small><b id="contTitle">Unit 1 · Getting by</b></span><i>›</i></button>
+    <div class="fact reveal-up" id="homeFact"></div>
+  </div>
+  </div>
+  <button class="nextpg" data-go="pgLearn">Swipe up to practise <span>⌄</span></button>
+</section>
 
+<!-- PAGE 2: PRACTICE -->
+<section class="pg pg-learn" id="pgLearn" data-name="Practice">
+  <div class="wrap learnwrap">
+  <div class="pgtitle"><h2>Practice</h2><span id="learnSub"></span></div>
   <div class="levels" id="levels" role="group" aria-label="Level"></div>
   <div class="chips" id="topics" role="group" aria-label="Topic"></div>
-
   <div class="stage" id="stage">
     <article class="card" id="card" aria-live="polite">
-      <div class="meta"><span id="pos"></span><span id="topicName"></span><span class="voicetag" id="voicetag" hidden><i></i>Native</span><span class="lock" id="lockTag"></span></div>
+      <div class="meta"><span id="pos"></span><span id="topicName"></span><span class="voicetag" id="voicetag" hidden><i></i>Native</span><span class="lock" id="lockTag"></span><button class="favbtn" id="favBtn" aria-label="Save phrase"></button></div>
       <div class="prog" id="prog"></div>
       <div class="kn-text" id="target" lang="kn"></div>
       <div class="roman" id="roman"></div>
@@ -325,9 +450,10 @@ button:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
     </article>
   </div>
   <p class="swipe-hint" id="hint">Say it correctly to unlock the next phrase</p>
-  <button class="unlock" id="testBtn" hidden>📝 Take the unit test</button>
-
+  <button class="unlock" id="testBtn" hidden>Take the unit test</button>
+  </div>
   <section class="result" id="result">
+    <button class="rclose" id="rclose" aria-label="Close">✕</button>
     <div class="scorerow" id="scorerow">
       <div class="ring"><svg width="58" height="58"><circle cx="29" cy="29" r="24" fill="none" stroke="var(--line)" stroke-width="7"/>
         <circle id="arc" cx="29" cy="29" r="24" fill="none" stroke="var(--leaf)" stroke-width="7" stroke-linecap="round" stroke-dasharray="151" stroke-dashoffset="151"/></svg>
@@ -349,20 +475,7 @@ button:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
     <p class="retry" id="retry" hidden>Tap Say it to try again — the next phrase unlocks at 75%.</p>
     <button class="unlock" id="unlock" hidden>Next phrase unlocked ›</button>
   </section>
-
-  <section class="daily reveal-up" id="daily">
-    <h3>Today's target<span id="dStreak"></span></h3>
-    <div class="drow"><span>Phrases said correctly</span><b id="dPh"></b></div>
-    <div class="bar"><i id="dPhBar"></i></div>
-    <div class="drow"><span>New words</span><b id="dW"></b></div>
-    <div class="bar y"><i id="dWBar"></i></div>
-    <div class="wordrow" id="wordrow"></div>
-  </section>
-  <section class="path" id="path"><h2>Your path</h2><p>Scroll to see what's ahead. Finish a unit and pass its test to open the next.</p><div id="pathList"></div></section>
-  <p style="text-align:center;font-size:12px;color:var(--soft);margin-top:18px">Kannaad IRL · version 8</p>
-</div>
-
-<nav class="dock" aria-label="Practice controls">
+  <nav class="dock" aria-label="Practice controls">
   <div class="dock-in">
     <button class="side" id="slow" aria-label="Play slowly"><span class="ic">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16c0-4 3.5-7 8-7s7 3 7 6v1H4z"/><path d="M19 13h2a1 1 0 0 0 0-2h-1"/><path d="M7 16v2M16 16v2"/><path d="M9 9.5 11 12l2-2.5"/></svg>
@@ -377,6 +490,35 @@ button:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
   </div>
   <div class="navrow"><button id="prev">‹ Previous</button><button id="next">Next ›</button></div>
 </nav>
+</section>
+
+<!-- PAGE 3: TODAY'S WORDS -->
+<section class="pg pg-words" id="pgWords" data-name="Today">
+  <div class="wrap">
+  <div class="pgtitle"><h2>Today</h2><span>Your daily target and 3 new words</span></div>
+  <section class="daily reveal-up" id="daily">
+    <h3>Today's target<span id="dStreak"></span></h3>
+    <div class="drow"><span>Phrases said correctly</span><b id="dPh"></b></div>
+    <div class="bar"><i id="dPhBar"></i></div>
+    <div class="drow"><span>New words</span><b id="dW"></b></div>
+    <div class="bar y"><i id="dWBar"></i></div>
+    <div class="wordrow" id="wordrow"></div>
+  </section>
+  <div class="tip reveal-up" id="savedBox"><b>Saved phrases</b><span id="savedEmpty">Double-tap any phrase card to save it here.</span><ul class="savedlist" id="savedList"></ul></div>
+  <div class="tip reveal-up"><b>How it works</b>Say phrases correctly to fill the green bar, and learn today's 3 words to fill the yellow one. Hit both every day to grow your streak.</div>
+  </div>
+  <button class="nextpg" data-go="pgPath">Swipe up for your path <span>⌄</span></button>
+</section>
+
+<!-- PAGE 4: PATH -->
+<section class="pg pg-path" id="pgPath" data-name="Path">
+  <div class="wrap">
+  <section class="path" id="path"><h2>Your path</h2><p>Scroll to see what's ahead. Finish a unit and pass its test to open the next.</p><div id="pathList"></div></section>
+  <p style="text-align:center;font-size:12px;color:var(--soft);margin:22px 0 30px">Kannaad IRL · version 11</p>
+  </div>
+</section>
+</main>
+<nav class="dots" id="dots" aria-label="Pages"></nav>
 
 <div class="toast" id="toast" role="status"></div>
 
@@ -386,7 +528,7 @@ button:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
 <section id="studio" hidden aria-label="Recording studio">
   <div class="st-wrap">
     <div class="st-head">
-      <div class="logo" aria-hidden="true">🎙</div>
+      <div class="logo" aria-hidden="true" style="font-size:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
       <h2>Studio<small>Your voice, phrase by phrase</small></h2>
       <button class="close" id="closeStudio">Done</button>
     </div>
@@ -1006,6 +1148,26 @@ const FACTS=[
 
 const ALL=PHRASES.concat(VOCAB);
 
+
+/* ============ ICONS (simple line icons) ============ */
+const ICO={
+ flame:'<path d="M12 3c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-1.6.7-2.7 1.6-3.6.2 1.4 1 2.1 1.9 2.1-.6-2.6-.2-4.9.5-7z"/>',
+ bolt:'<path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/>',
+ lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+ check:'<path d="m5 12.5 4.2 4.2L19 7"/>',
+ heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+ mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+ ear:'<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>',
+ star:'<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',
+ award:'<circle cx="12" cy="9" r="5.5"/><path d="m8.5 13.5-1.5 7 5-2.5 5 2.5-1.5-7"/>',
+ note:'<rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M9 8.5h6M9 12h6M9 15.5h3.5"/>',
+ book:'<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 1 4 17.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 0 1.5-1.5z"/>',
+ chat:'<path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4 3.5V16h0a2.5 2.5 0 0 1-2-2.5z"/><path d="M8.5 9h7M8.5 12h4.5"/>',
+ target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
+ up:'<path d="M4 16l5-5 3.5 3.5L20 7"/><path d="M15 7h5v5"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/>'
+};
+function I(n,sz,fill){return "<svg class='ic' width='"+(sz||18)+"' height='"+(sz||18)+"' viewBox='0 0 24 24' fill='"+(fill||"none")+"' stroke='currentColor' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>"+ICO[n]+"</svg>";}
 /* ============ HELPERS ============ */
 const $=id=>document.getElementById(id);
 const IN_CLAUDE=(()=>{try{return window.self!==window.top;}catch(e){return true;}})()&&location.protocol==="https:";
@@ -1014,13 +1176,13 @@ function hash(s){let h=5381;for(const c of s)h=((h*33)^c.codePointAt(0))>>>0;ret
 function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 let toastT;
 function toast(msg,ms){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),ms||2600);}
-function haptic(){try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}}
+function haptic(ms){try{if(typeof prog!=="undefined"&&prog.vib===false)return;navigator.vibrate&&navigator.vibrate(ms||12)}catch(e){}}
 
 /* ============ LEARNER PROGRESS (tiny, this phone only) ============ */
 const PKEY="kol-progress-v1";
-let prog={best:{},heard:{},days:[],lvl:1,topic:"All",goal:5,daily:{d:"",c:[],w:[]},goalDays:[],words:{},factN:0,done:{},passed:{}};
+let prog={best:{},heard:{},days:[],lvl:1,topic:"All",goal:5,daily:{d:"",c:[],w:[]},goalDays:[],words:{},factN:0,done:{},passed:{},xp:0,fav:[],sfx:true,vib:true,onb:false};
 try{const s=localStorage.getItem(PKEY);if(s)prog=Object.assign(prog,JSON.parse(s));}catch(e){}
-if(!prog.passed)prog.passed={};
+if(!prog.passed)prog.passed={};if(!prog.fav)prog.fav=[];if(prog.xp==null)prog.xp=0;if(prog.sfx==null)prog.sfx=true;if(prog.vib==null)prog.vib=true;
 function saveProg(){try{localStorage.setItem(PKEY,JSON.stringify(prog));}catch(e){}}
 function today(){const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
 const TH=0.75;                        // score needed to unlock the next phrase
@@ -1045,7 +1207,7 @@ function todayWords(){
   }
   return prog.words[t].map(t=>VOCAB.find(w=>w.t===t)).filter(Boolean);
 }
-function renderStreak(){
+function renderStreak(){try{$("xpN").textContent=prog.xp||0;$("streak").classList.toggle("met",prog.goalDays.includes(today()));}catch(e){}setTimeout(()=>{try{renderHome();}catch(e){}},0);
   const d=daily(),n=streakCount(),words=todayWords();
   const wDone=words.filter(w=>d.w.includes(w.t)).length;
   const ph=Math.min(d.c.length,prog.goal);
@@ -1054,13 +1216,13 @@ function renderStreak(){
   $("dayArc").style.strokeDashoffset=53.4-53.4*frac;
   $("dPh").textContent=d.c.length+" / "+prog.goal;$("dPhBar").style.width=(ph/prog.goal*100)+"%";
   $("dW").textContent=wDone+" / "+words.length;$("dWBar").style.width=(wDone/words.length*100)+"%";
-  $("dStreak").textContent=prog.goalDays.includes(today())?"Done for today ✓":n?"🔥 "+n+"-day streak":"Start a streak";
+  $("dStreak").textContent=prog.goalDays.includes(today())?"Done for today ✓":n?n+"-day streak":"Start a streak";
   $("wordrow").innerHTML=words.map(w=>"<button data-w='"+esc(w.t)+"' class='"+(d.w.includes(w.t)?"learned":"")+"'><span lang='kn'>"+esc(w.t)+"</span><small>"+esc(w.g)+"</small></button>").join("");
 }
 $("wordrow").onclick=e=>{const b=e.target.closest("button");if(!b)return;
   if(prog.topic!=="__words"){prog.topic="__words";saveProg();build();}
   const n=list.findIndex(p=>p.t===b.dataset.w);if(n>=0){i=n;render();}
-  window.scrollTo({top:0,behavior:"smooth"});};
+  goPage("pgLearn");};
 
 /* ---- unit tests ---- */
 let T=null;
@@ -1076,8 +1238,8 @@ function renderPath(){
     if(u.lvl!==lastL){lastL=u.lvl;const L=LEVELS.find(x=>x[0]===u.lvl);h+="<div class='lvl-h reveal-up'>"+L[1]+" <small lang='kn'>"+L[2]+"</small></div>";}
     const ph=PHRASES.filter(p=>p.lvl===u.lvl&&p.topic===u.topic),d=ph.filter(p=>isClear(keyOf(p))).length,open=unitOpen(u),pass=!!prog.passed[u.id];
     const st=pass?"done":open?"open":"locked",now=open&&!pass&&u.id===cur.id;
-    const tag=pass?"Passed ✓":!open?"🔒 Locked":d===ph.length?"📝 Test ready":d?"In progress":"Start";
-    h+="<button class='ucard "+st+(now?" now":"")+"' data-u='"+u.n+"'><div class='badge'>"+(pass?"✓":!open?"🔒":(u.n+1))+"</div><div>"
+    const tag=pass?"Passed ✓":!open?"Locked":d===ph.length?"Test ready":d?"In progress":"Start";
+    h+="<button class='ucard "+st+(now?" now":"")+"' data-u='"+u.n+"'><div class='badge'>"+(pass?I("check",22):!open?I("lock",18):(u.n+1))+"</div><div>"
       +"<div class='ut'>"+esc(u.topic)+"</div><div class='us'>Unit "+(u.n+1)+" · "+d+" / "+ph.length+" phrases</div>"
       +"<div class='uk' lang='kn'>"+ph.slice(0,3).map(p=>esc(p.t)).join(" · ")+"</div>"
       +"<div class='ub'><i data-w='"+Math.round(d/ph.length*100)+"%'></i></div></div><span class='tag'>"+tag+"</span></button>";});
@@ -1086,12 +1248,12 @@ function renderPath(){
 $("pathList").onclick=e=>{const b=e.target.closest(".ucard");if(!b)return;const u=UNITS[+b.dataset.u];
   if(!unitOpen(u)){b.classList.remove("shake");void b.offsetWidth;b.classList.add("shake");toast("Pass the "+UNITS[u.n-1].topic+" test to unlock this unit.");haptic();return;}
   const ph=PHRASES.filter(p=>p.lvl===u.lvl&&p.topic===u.topic);
-  prog.lvl=u.lvl;prog.topic=u.topic;saveProg();build();window.scrollTo({top:0,behavior:"smooth"});haptic();
+  prog.lvl=u.lvl;prog.topic=u.topic;saveProg();build();goPage("pgLearn");haptic();
   if(!prog.passed[u.id]&&ph.every(p=>isClear(keyOf(p))))setTimeout(()=>startTest(u),500);};
 function renderTestBtn(){
   const b=$("testBtn");if(prog.topic==="__words"||!list.length){b.hidden=true;return;}
   const U=unitOf(list[0]);const ready=U&&!prog.passed[U.id]&&list.every(p=>isClear(keyOf(p)));
-  b.hidden=!ready;if(ready){b.textContent="📝 Take the "+U.topic+" test";b.onclick=()=>startTest(U);}
+  b.hidden=!ready;if(ready){b.innerHTML=I("note",18)+" Take the "+esc(U.topic)+" test";b.onclick=()=>startTest(U);}
 }
 function startTest(U){
   stopAll();const pool=PHRASES.filter(p=>p.lvl===U.lvl&&p.topic===U.topic);
@@ -1112,7 +1274,7 @@ function showQ(){
   if(q.kind==="hear"){$("tPlay").onclick=()=>speak(p.t,false);setTimeout(()=>speak(p.t,false),350);}
   let answered=false;
   $("tOpts").onclick=e=>{const b=e.target.closest("button[data-n]");if(!b||answered)return;answered=true;
-    const ok=opts[+b.dataset.n]===p;if(ok)T.right++;haptic();
+    const ok=opts[+b.dataset.n]===p;if(ok)T.right++;haptic(ok?20:45);sfx(ok?"good":"bad");
     [...$("tOpts").children].forEach((x,n)=>{if(opts[n]===p){x.style.background="var(--okbg)";x.style.borderColor="var(--leaf)";}
       else if(x===b){x.style.background="var(--nobg)";x.style.borderColor="var(--flag)";}});
     if(!ok&&q.kind==="pick")speak(p.t,false);
@@ -1121,11 +1283,11 @@ function showQ(){
 function endTest(){
   const U=T.U,need=Math.ceil(T.qs.length*0.8),pass=T.right>=need;delete $("sheet").dataset.lock;
   if(pass){
-    prog.passed[U.id]=1;saveProg();$("scrim").hidden=true;
+    prog.passed[U.id]=1;saveProg();$("scrim").hidden=true;sfx("unlock");setTimeout(()=>addXP(50,$("pgLearn")),300);
     const nx=UNITS[U.n+1],lvlDone=!nx||nx.lvl!==U.lvl,L=LEVELS.find(x=>x[0]===U.lvl),NL=nx&&LEVELS.find(x=>x[0]===nx.lvl);
-    celebrate({emoji:lvlDone?"🏆":"🎉",title:lvlDone?"Level complete: "+L[1]:"Test passed: "+T.right+"/"+T.qs.length,
+    celebrate({emoji:lvlDone?"award":"star",title:lvlDone?"Level complete: "+L[1]:"Test passed: "+T.right+"/"+T.qs.length,
       body:lvlDone?(nx?"You passed every unit test in "+L[1]+". "+NL[1]+" is now open.":"You passed every unit in the app. ಅದ್ಭುತ!"):"Next unit unlocked: "+nx.topic+". ಚೆನ್ನಾಗಿದೆ!",
-      cta:nx?"Start "+nx.topic:"Keep practising",then:()=>{if(nx){prog.lvl=nx.lvl;prog.topic=nx.topic;saveProg();}build();window.scrollTo({top:0,behavior:"smooth"});}});
+      cta:nx?"Start "+nx.topic:"Keep practising",then:()=>{if(nx){prog.lvl=nx.lvl;prog.topic=nx.topic;saveProg();}build();goPage("pgLearn");}});
     renderPath();
   }else{
     $("sheet").innerHTML="<h2>"+T.right+" / "+T.qs.length+" — almost</h2><p>You need "+need+" correct to pass. Listen to the phrases once more, then try again.</p>"
@@ -1143,7 +1305,7 @@ function showNext(){
   const colors=["#E3EBB4","#C6D38A","#5B8A3C","#9CC77A","#F2E7A6"];
   const conf=Array.from({length:26},(_,n)=>"<i style='left:"+(Math.random()*100)+"%;background:"+colors[n%5]+";animation-delay:"+(Math.random()*.5)+"s'></i>").join("");
   $("sheet").className="sheet celebrate";
-  $("sheet").innerHTML="<div class='confetti'>"+conf+"</div><div class='big'>"+o.emoji+"</div><h2 style='margin-top:10px'>"+o.title+"</h2><p>"+o.body+"</p>"
+  $("sheet").innerHTML="<div class='confetti'>"+conf+"</div><div class='icirc'>"+(ICO[o.emoji]?I(o.emoji,40):o.emoji)+"</div><h2 style='margin-top:10px'>"+o.title+"</h2><p>"+o.body+"</p>"
     +"<div class='fact'><b>Did you know?</b>"+nextFact()+"</div><button class='go' id='celeGo'>"+(o.cta||"Keep going")+"</button>";
   $("scrim").hidden=false;haptic();
   $("celeGo").onclick=()=>{$("scrim").hidden=true;if(o.then)o.then();setTimeout(showNext,250);};
@@ -1152,15 +1314,15 @@ function openToday(){
   const n=streakCount(),d=daily();
   const days=[...Array(7)].map((_,j)=>{const x=new Date();x.setDate(x.getDate()-6+j);return x;});
   $("sheet").className="sheet";
-  $("sheet").innerHTML="<h2>🔥 "+n+" day"+(n===1?"":"s")+" in a row</h2><p>Hit your target every day to grow your streak.</p>"
-    +"<div class='week'>"+days.map(x=>"<div>"+x.toLocaleDateString(undefined,{weekday:"narrow"})+"<i class='"+(prog.goalDays.includes(dkey(x))?"met ":"")+(dkey(x)===today()?"today":"")+"'>"+(prog.goalDays.includes(dkey(x))?"🔥":"")+"</i></div>").join("")+"</div>"
+  $("sheet").innerHTML="<h2>"+I("flame",22)+" "+n+" day"+(n===1?"":"s")+" in a row</h2><p>Hit your target every day to grow your streak.</p>"
+    +"<div class='week'>"+days.map(x=>"<div>"+x.toLocaleDateString(undefined,{weekday:"narrow"})+"<i class='"+(prog.goalDays.includes(dkey(x))?"met ":"")+(dkey(x)===today()?"today":"")+"'>"+(prog.goalDays.includes(dkey(x))?I("check",16):"")+"</i></div>").join("")+"</div>"
     +"<div class='sec'>Daily target</div><p>Phrases to say correctly each day, plus "+WORDS_PER_DAY+" new words.</p>"
     +"<div class='goals' id='goals'>"+[[3,"Easy"],[5,"Steady"],[10,"Serious"]].map(([g,l])=>"<button data-g='"+g+"' aria-pressed='"+(prog.goal===g)+"'>"+g+"<small>"+l+"</small></button>").join("")+"</div>"
     +"<p style='margin-top:12px'>Today: <b style='color:var(--ink)'>"+d.c.length+" phrase"+(d.c.length===1?"":"s")+"</b> and <b style='color:var(--ink)'>"+todayWords().filter(w=>d.w.includes(w.t)).length+" of "+WORDS_PER_DAY+" words</b>.</p>"
     +"<button class='go' id='todayGo'>Practise today's words</button>";
   $("scrim").hidden=false;
   $("goals").onclick=e=>{const b=e.target.closest("button");if(!b)return;prog.goal=+b.dataset.g;saveProg();checkGoal();renderStreak();openToday();};
-  $("todayGo").onclick=()=>{$("scrim").hidden=true;prog.topic="__words";saveProg();build();window.scrollTo({top:0,behavior:"smooth"});};
+  $("todayGo").onclick=()=>{$("scrim").hidden=true;prog.topic="__words";saveProg();build();goPage("pgLearn");};
 }
 $("streak").onclick=openToday;
 $("scrim").onclick=e=>{if(e.target===$("scrim")&&!$("celeGo")&&!$("sheet").dataset.lock){$("scrim").hidden=true;}};
@@ -1170,7 +1332,7 @@ function checkGoal(){
   if(d.c.length>=prog.goal&&words.every(w=>d.w.includes(w.t))){
     prog.goalDays.push(today());prog.goalDays=prog.goalDays.slice(-120);saveProg();
     const n=streakCount();
-    celebrate({emoji:"🔥",title:"Today's target done!",body:n>1?"That's "+n+" days in a row. ಭೇಷ್!":"Day one of your streak. Come back tomorrow to keep it going."});
+    celebrate({emoji:"sun",title:"Today's target done!",body:n>1?"That's "+n+" days in a row. ಭೇಷ್!":"Day one of your streak. Come back tomorrow to keep it going."});
   }
 }
 function onClear(p){
@@ -1181,11 +1343,11 @@ function onClear(p){
   if(p.w){
     const tw=todayWords();
     if(tw.every(w=>d.w.includes(w.t))&&!prog.done["words:"+today()]){prog.done["words:"+today()]=1;saveProg();
-      celebrate({emoji:"📚",title:"New words learned",body:"You learned "+tw.length+" new words today.",cta:"Back to phrases",then:()=>{prog.topic="All";saveProg();build();}});}
+      celebrate({emoji:"book",title:"New words learned",body:"You learned "+tw.length+" new words today.",cta:"Back to phrases",then:()=>{prog.topic="All";saveProg();build();}});}
   }else{
     const unit=PHRASES.filter(q=>q.lvl===p.lvl&&q.topic===p.topic),uk="u:"+p.lvl+"|"+p.topic,U=unitOf(p);
     if(unit.every(q=>isClear(keyOf(q)))&&!prog.done[uk]&&U&&!prog.passed[U.id]){prog.done[uk]=1;saveProg();
-      celebrate({emoji:"📝",title:"Unit done: "+p.topic,body:"All "+unit.length+" phrases said correctly. Pass a short test to unlock the next unit.",cta:"Start the test",then:()=>startTest(U)});
+      celebrate({emoji:"note",title:"Unit done: "+p.topic,body:"All "+unit.length+" phrases said correctly. Pass a short test to unlock the next unit.",cta:"Start the test",then:()=>startTest(U)});
     }
   }
   checkGoal();renderStreak();
@@ -1206,7 +1368,9 @@ const hasVoice=k=>pending.has(k)||!!VD.native[k];
 const player=new Audio();player.preload="auto";
 const prefetch=new Audio();prefetch.preload="auto";
 let kvoice=null;
-function pickVoice(){try{const vs=speechSynthesis.getVoices();kvoice=vs.find(v=>v.lang==="kn-IN")||vs.find(v=>(v.lang||"").startsWith("kn"))||null;}catch(e){}}
+function pickVoice(){try{const vs=speechSynthesis.getVoices().filter(v=>/^kn/i.test(v.lang||"")||/kannada|ಕನ್ನಡ/i.test(v.name||""));
+  const rank=v=>(/natural|neural|online|premium|enhanced|wavenet/i.test(v.name)?4:0)+(/google/i.test(v.name)?3:0)+(/microsoft/i.test(v.name)?2:0)+(v.lang==="kn-IN"?1:0)+(v.localService?0:1);
+  kvoice=vs.sort((a,b)=>rank(b)-rank(a))[0]||null;}catch(e){}}
 if("speechSynthesis"in window){speechSynthesis.onvoiceschanged=()=>{pickVoice();if(list.length)render();};pickVoice();}
 
 function setPlaying(on){$("play").classList.toggle("on",on);}
@@ -1225,14 +1389,14 @@ function speak(text,slow){
   stopAll();
   if(url)playURL(url,slow);
   else if(kvoice){
-    const u=new SpeechSynthesisUtterance(text);u.lang="kn-IN";u.voice=kvoice;u.rate=slow?0.55:0.9;
+    const u=new SpeechSynthesisUtterance(text);u.lang="kn-IN";u.voice=kvoice;u.rate=slow?0.7:0.95;u.pitch=1;u.volume=1;
     u.onstart=()=>setPlaying(true);u.onend=u.onerror=()=>setPlaying(false);
     speechSynthesis.speak(u);
-  }else if(VD.computer[k])playURL(VD.computer[k],slow);
+  }else if(VD.computer[k]){playURL(VD.computer[k],slow);if(!prog.voiceTip)setTimeout(voiceHint,2500);}
   else toast("No recording for this phrase yet.");
   prog.heard[k]=1;saveProg();markDay();renderProg();
 }
-function voiceLabel(k){return hasVoice(k)?"Native voice":kvoice?"Phone voice":VD.computer[k]?"Computer voice":"";}
+function voiceLabel(k){return hasVoice(k)?"Native voice":kvoice?"Phone voice":VD.computer[k]?"Basic voice":"";}
 
 /* ============ DECK ============ */
 const LEVELS=[[1,"Basics","ಮೊದಲು"],[2,"Around town","ಓಡಾಟ"],[3,"Chatting","ಮಾತುಕತೆ"],[4,"Fluent","ಸರಾಗ"]];
@@ -1255,21 +1419,21 @@ function build(){
   if(prog.topic!=="__words"){const u=lvlUnits.find(u=>u.topic===prog.topic);if(!u||!unitOpen(u))prog.topic=currentUnit(prog.lvl).topic;}
   $("topics").innerHTML="";
   {const tw=todayWords(),d=daily(),b=document.createElement("button");b.className="wordchip";
-    b.textContent="★ New words "+tw.filter(w=>d.w.includes(w.t)).length+"/"+tw.length;
+    b.innerHTML=I("star",14)+" New words "+tw.filter(w=>d.w.includes(w.t)).length+"/"+tw.length;
     b.setAttribute("aria-pressed",prog.topic==="__words");
     b.onclick=()=>{prog.topic="__words";saveProg();build();haptic();};$("topics").appendChild(b);}
   lvlUnits.forEach(u=>{const b=document.createElement("button"),open=unitOpen(u),pass=!!prog.passed[u.id];
-    b.textContent=(open?"":"🔒 ")+u.topic+(pass?" ✓":"");
+    b.innerHTML=(open?"":I("lock",13)+" ")+esc(u.topic)+(pass?" "+I("check",14):"");
     b.setAttribute("aria-pressed",u.topic===prog.topic);if(!open)b.style.opacity=".55";
     b.onclick=()=>{if(!open){toast("Pass the "+UNITS[u.n-1].topic+" test to unlock this unit.");haptic();return;}
       prog.topic=u.topic;saveProg();build();haptic();};$("topics").appendChild(b);});
   [...$("levels").children].forEach(b=>{const v=+b.dataset.v,open=levelOpen(v);
     b.setAttribute("aria-pressed",prog.topic!=="__words"&&v===prog.lvl);b.style.opacity=open?"":".5";
-    b.querySelector(".lk")&&b.querySelector(".lk").remove();if(!open)b.insertAdjacentHTML("afterbegin","<span class='lk'>🔒 </span>");});
+    b.querySelector(".lk")&&b.querySelector(".lk").remove();if(!open)b.insertAdjacentHTML("afterbegin","<span class='lk'>"+I("lock",12)+" </span>");});
   list=prog.topic==="__words"?todayWords():inLvl.filter(p=>p.topic===prog.topic);
   // start at the first phrase not yet unlocked
   i=Math.max(0,list.findIndex(p=>!isClear(keyOf(p))));
-  render();renderPath();
+  render();renderPath();try{renderHome();}catch(e){}
 }
 function renderProg(){
   const box=$("prog");
@@ -1290,15 +1454,15 @@ function render(){
   {const vl=voiceLabel(k);$("voicetag").hidden=!vl;$("voicetag").innerHTML="<i></i>"+vl;}
   $("result").classList.remove("show");$("upnext")&&$("upnext").remove();
   {const c=$("card");c.classList.remove("enter");void c.offsetWidth;c.classList.add("enter");}
-  renderLock();renderProg();renderTestBtn();
+  renderLock();renderProg();renderTestBtn();renderFav();
   // warm up the next clip so it plays instantly
   const nx=list[(i+1)%list.length];const u=nx&&clipURL(keyOf(nx));
   
 }
 function renderLock(){
   const p=list[i];if(!p)return;const ok=isClear(keyOf(p)),last=i===list.length-1;
-  $("lockTag").textContent=ok?"✓ Unlocked":"🔒 Locked";$("lockTag").className="lock"+(ok?" open":"");
-  $("next").textContent=ok?(last?"Start over ›":"Next ›"):"🔒 Next";
+  $("lockTag").innerHTML=ok?I("check",13)+" Unlocked":I("lock",13)+" Locked";$("lockTag").className="lock"+(ok?" open":"");
+  $("next").innerHTML=ok?(last?"Start over ›":"Next ›"):I("lock",14)+" Next";
   $("hint").textContent=ok?"Swipe the card for the next phrase":"Say it correctly to unlock the next phrase";
 }
 function go(d){
@@ -1356,22 +1520,22 @@ function micHelp(why){
   const ua=navigator.userAgent,ios=/iPhone|iPad|iPod/.test(ua),inapp=/FBAN|FBAV|Instagram|WhatsApp|Line\/|wv\)/.test(ua);
   let h;
   if(insecure||inapp||why==="blocked"){
-    h="<h2>🎙 Recording needs the app link</h2><p>Phones don't allow the microphone when the app is opened as a file. "
+    h="<h2>Recording needs the app link</h2><p>Phones don't allow the microphone when the app is opened as a file. "
      +"Open the app from its link instead: <b>claude.ai/artifact/XYGyW1gwqNQtAtSxY7xx2T</b> — recording, progress and daily words all work there.</p>"
      +"<p class='install'>Or tap below to record this phrase with your phone's recorder app.</p>";
   }else if(denied){
-    h="<h2>🎙 Microphone access is off</h2><p>This browser was told not to use the mic for this page. Turn it back on, then reload:</p>"
+    h="<h2>Microphone access is off</h2><p>This browser was told not to use the mic for this page. Turn it back on, then reload:</p>"
      +(ios?"<p><b>Safari:</b> tap <b>aA</b> in the address bar → <b>Website Settings</b> → <b>Microphone</b> → <b>Ask</b> or <b>Allow</b>.<br>Also check iPhone <b>Settings → Apps → Safari → Microphone</b>.</p>"
           :"<p><b>Chrome on Android:</b><br>1. Tap <b>⋮</b> (top right) → <b>Settings</b> → <b>Site settings</b> → <b>Microphone</b>. Make sure it's on, and if <b>"+esc(IN_CLAUDE?"claude.ai":location.hostname)+"</b> is under Blocked, tap it → <b>Allow</b>.<br>"
            +"2. Open your phone's <b>Settings → Apps → Chrome → Permissions → Microphone</b> → <b>Allow only while using the app</b>.<br>3. Come back and reload this page.</p>");
   }else if(nomic){
-    h="<h2>🎙 No microphone found</h2><p>Another app may be using it (a call, a voice note). Close it and try again.</p>";
+    h="<h2>No microphone found</h2><p>Another app may be using it (a call, a voice note). Close it and try again.</p>";
   }else{
-    h="<h2>🎙 Couldn't start the microphone</h2><p>Reload the page and tap <b>Say it</b> again. If it keeps failing, open the app in Chrome or Safari from an https:// link.</p>";
+    h="<h2>Couldn't start the microphone</h2><p>Reload the page and tap <b>Say it</b> again. If it keeps failing, open the app in Chrome or Safari from an https:// link.</p>";
   }
   if(denied&&IN_CLAUDE)h+="<p>If you opened this inside the Claude app, open the link in <b>Chrome</b> or <b>Safari</b> instead and tap Say it again.</p>";
   h+="<p style='font-size:12.5px;opacity:.7;margin-top:10px'>Details: "+esc(String(why||"no mic API"))+" · "+esc(location.protocol.replace(":",""))+(IN_CLAUDE?" · in viewer":"")+"</p>";
-  $("sheet").className="sheet";$("sheet").innerHTML=h+"<button class='go' id='micRec'>🎙 Use my phone's recorder instead</button><button class='go' id='micOk' style='background:var(--surface);color:var(--ink);border:1px solid var(--line);margin-top:10px'>OK</button>";
+  $("sheet").className="sheet";$("sheet").innerHTML=h+"<button class='go' id='micRec'>Use my phone's recorder instead</button><button class='go' id='micOk' style='background:var(--surface);color:var(--ink);border:1px solid var(--line);margin-top:10px'>OK</button>";
   $("scrim").hidden=false;$("micOk").onclick=()=>{$("scrim").hidden=true;};
   $("micRec").onclick=()=>{$("scrim").hidden=true;recordWithPhone($("studio").hidden?attemptFromFile:f=>{take={blob:f,type:f.type||"audio/mp4",url:URL.createObjectURL(f)};renderStudio();});};
 }
@@ -1432,7 +1596,7 @@ async function attemptFromFile(f){
   showResult(target,null,ac);
 }
 $("mic").onclick=()=>{
-  if(FILE_MODE){recordWithPhone(attemptFromFile);toast("Record yourself saying it, then tap ✓ / Done.",3500);return;}
+  if(FILE_MODE){recordWithPhone(attemptFromFile);toast("Record yourself saying it, then tap Done.",3500);return;}
   if(live)live.finish();else startAttempt();};
 $("cmpYou").onclick=()=>{if(!mineURL)return;stopAll();player.src=mineURL;player.playbackRate=1;player.play().catch(()=>{});};
 
@@ -1473,9 +1637,9 @@ function showResult(target,alts,ac){
     const pct=Math.round(score*100);{const t0=performance.now();const tick=t=>{const f=Math.min(1,(t-t0)/700);$("pct").textContent=Math.round(pct*(1-Math.pow(1-f,3)))+"%";if(f<1)requestAnimationFrame(tick);};requestAnimationFrame(tick);}
     const arc=$("arc");arc.style.transition="stroke-dashoffset .7s";arc.style.strokeDashoffset=151-151*score;
     arc.setAttribute("stroke",score>=TH?"var(--leaf)":score>=0.5?"var(--amber)":"var(--flag)");
-    const how=acScore!==null&&acScore>=tScore?(ac.approx?" Rough check against the computer voice.":" Compared with the native recording."):hasText?" Checked by speech recognition.":"";
-    const emo=score>=0.9?"🌟":score>=TH?"👏":score>=0.5?"💪":"🎧";
-    $("verdict").innerHTML="<span class='emo'>"+emo+"</span>"+(score>=0.9?"ಸೂಪರ್! Crystal clear.<small>Anyone in Bengaluru would get that first time."+how+"</small>"
+    const how=acScore!==null&&acScore>=tScore?(ac.approx?" Rough check against the basic voice.":" Compared with the native recording."):hasText?" Checked by speech recognition.":"";
+    const emo=score>=0.9?I("star",17):score>=TH?I("check",17):score>=0.5?I("up",17):I("ear",17);
+    $("verdict").innerHTML="<span class='emo "+(score>=TH?"":score>=0.5?"mid":"low")+"'>"+emo+"</span>"+(score>=0.9?"ಸೂಪರ್! Crystal clear.<small>Anyone in Bengaluru would get that first time."+how+"</small>"
       :score>=TH?"ಚೆನ್ನಾಗಿದೆ — you'd be understood.<small>Small slips only."+how+"</small>"
       :score>=0.5?"Almost.<small>"+(hasText?"Some words landed. Look at the red ones, then try again.":"Close. Listen once more and match the rhythm.")+how+"</small>"
       :"Not yet.<small>Play it slowly, copy the rhythm first, then the sounds."+how+"</small>");
@@ -1486,7 +1650,7 @@ function showResult(target,alts,ac){
       else if(ac.ratio<0.72)tips.push("You were quicker than the native speaker. Give the long vowels their full length.");}
     if(!tips.length&&score<TH)tips.push("Slow down — rushing merges syllables Kannada keeps apart.");
     $("tips").innerHTML=tips.map(t=>"<li>"+t+"</li>").join("");
-    if(score>=TH){passed(p,!was);}else $("retry").hidden=false;
+    if(score>=TH){passed(p,!was);}else{$("retry").hidden=false;combo=0;sfx("bad");haptic(40);}
   }else{
     $("scorerow").hidden=selfMode;
     if(!selfMode){$("pct").textContent="–";$("arc").style.strokeDashoffset=151;
@@ -1496,14 +1660,14 @@ function showResult(target,alts,ac){
   }
   $("cmpLabel").textContent=mine?"Play them back to back and listen for the difference.":"Listen to the recording again.";
   $("result").classList.add("show");
-  setTimeout(()=>$("result").scrollIntoView({behavior:"smooth",block:"nearest"}),60);
+  setDockH();
   if(mine&&selfMode) setTimeout(()=>{ /* auto A/B: native then you */
     speak(target,false);player.onended=()=>{setPlaying(false);player.onended=()=>setPlaying(false);
       setTimeout(()=>{player.src=mineURL;player.playbackRate=1;player.play().catch(()=>{});},350);};
   },250);
 }
 function passed(p,firstTime){
-  haptic();renderLock();renderProg();
+  combo++;const gain=(firstTime?10:5)*(combo>=3?2:1);sfx(combo>=3?"great":"good");haptic(25);setTimeout(()=>addXP(gain),250);showCombo();renderLock();renderProg();
   const last=i===list.length-1;
   $("unlock").hidden=true;
   {const c=$("card");const cols=["#5B8A3C","#C6D38A","#F2E7A6","#9CC77A","#263214"];const bx=document.createElement("div");bx.className="burst";
@@ -1650,7 +1814,7 @@ async function copyLink(){
   try{await navigator.clipboard.writeText(SHARE_URL);toast("Link copied. Paste it anywhere.");return true;}
   catch(e){toast("Press and hold the link below to copy it.");return false;}
 }
-function studioLink(){return "<button class='go' id='shStudio' style='background:var(--surface);color:var(--ink);border:1px solid var(--line);margin-top:10px'>🎙 Record a native voice</button>";}
+function studioLink(){return "<button class='go' id='shStudio' style='background:var(--surface);color:var(--ink);border:1px solid var(--line);margin-top:10px'>Record a native voice</button>";}
 function wireStudioLink(){$("shStudio").onclick=()=>{$("scrim").hidden=true;openStudio();};}
 function openShare(){
   if(!HOSTED){
@@ -1680,9 +1844,115 @@ function openShareLink(){
 }
 $("shareBtn").onclick=openShare;
 
+
+
+/* ============ APP-STYLE INTERACTIONS ============ */
+/* sounds (synthesised, no files) */
+let sctx=null;
+function sfx(kind){if(!prog.sfx)return;try{if(!sctx){const AC=window.AudioContext||window.webkitAudioContext;sctx=new AC();}
+  const notes={good:[[660,0],[990,.09]],great:[[523,0],[659,.08],[784,.16],[1046,.24]],bad:[[220,0],[175,.12]],tap:[[880,0]],unlock:[[392,0],[523,.1],[659,.2],[784,.3],[1046,.42]]}[kind]||[];
+  const t0=sctx.currentTime+.01;notes.forEach(([f,d])=>{const o=sctx.createOscillator(),g=sctx.createGain();o.type=kind==="bad"?"triangle":"sine";o.frequency.value=f;
+    g.gain.setValueAtTime(0,t0+d);g.gain.linearRampToValueAtTime(kind==="tap"?.05:.16,t0+d+.015);g.gain.exponentialRampToValueAtTime(.001,t0+d+(kind==="tap"?.06:.28));
+    o.connect(g).connect(sctx.destination);o.start(t0+d);o.stop(t0+d+.32);});}catch(e){}}
+/* XP + combo */
+let combo=0;
+function floatText(txt,el){const r=(el||$("card")).getBoundingClientRect(),f=document.createElement("div");f.className="float";f.textContent=txt;
+  f.style.left=(r.left+r.width/2)+"px";f.style.top=(r.top+r.height*0.35)+"px";document.body.appendChild(f);setTimeout(()=>f.remove(),1200);}
+function addXP(n,el){prog.xp=(prog.xp||0)+n;saveProg();floatText("+"+n+" XP",el);const x=$("xpN");x.textContent=prog.xp;
+  const pill=$("xpPill");pill.animate([{transform:"scale(1)"},{transform:"scale(1.25)"},{transform:"scale(1)"}],{duration:400});}
+function showCombo(){if(combo<3)return;const c=document.createElement("div");c.className="combo";c.innerHTML=I("flame",14)+" "+combo+" in a row · double XP";$("card").appendChild(c);setTimeout(()=>c.remove(),1600);}
+/* favourites: double-tap the card or tap the heart */
+function isFav(k){return prog.fav.includes(k);}
+function toggleFav(k,pop){const n=prog.fav.indexOf(k);if(n>=0)prog.fav.splice(n,1);else{prog.fav.push(k);if(pop){const h=document.createElement("div");h.className="heart";h.innerHTML=I("heart",96,"currentColor");$("card").appendChild(h);setTimeout(()=>h.remove(),950);}sfx("tap");}
+  saveProg();haptic(18);renderFav();renderSaved();}
+function renderFav(){const p=list[i];if(!p)return;const on=isFav(keyOf(p));$("favBtn").innerHTML=on?I("heart",18,"currentColor"):I("heart",18);$("favBtn").classList.toggle("on",on);}
+function renderSaved(){const items=prog.fav.map(k=>ALL.find(p=>p.t===k)).filter(Boolean);$("savedEmpty").hidden=!!items.length;
+  $("savedList").innerHTML=items.map(p=>"<li><div><b lang='kn'>"+esc(p.t)+"</b><small>"+esc(p.r)+" · "+esc(p.g)+"</small></div><button data-t='"+esc(p.t)+"' aria-label='Play'>▶</button></li>").join("");}
+$("savedList").onclick=e=>{const b=e.target.closest("button[data-t]");if(b)speak(b.dataset.t,false);};
+$("favBtn").onclick=e=>{e.stopPropagation();const p=list[i];if(p)toggleFav(keyOf(p),false);};
+{let lastTap=0;$("card").addEventListener("click",e=>{if(e.target.closest("button"))return;const t=Date.now();
+  if(t-lastTap<320){const p=list[i];if(p&&!isFav(keyOf(p)))toggleFav(keyOf(p),true);else if(p){const h=document.createElement("div");h.className="heart";h.innerHTML=I("heart",96,"currentColor");$("card").appendChild(h);setTimeout(()=>h.remove(),950);}lastTap=0;}
+  else{lastTap=t;setTimeout(()=>{if(lastTap===t&&e.target.closest("#target"))speak(list[i].t,false);},330);}});}
+/* swipe down to close sheets */
+function dragClose(el,onClose,canClose){let y0=null,dy=0;
+  el.addEventListener("touchstart",e=>{if(el.scrollTop>0)return;y0=e.touches[0].clientY;dy=0;el.style.transition="none";},{passive:true});
+  el.addEventListener("touchmove",e=>{if(y0===null)return;dy=Math.max(0,e.touches[0].clientY-y0);if(dy>0)el.style.transform="translateY("+dy+"px)";},{passive:true});
+  el.addEventListener("touchend",()=>{if(y0===null)return;el.style.transition="transform .25s";
+    if(dy>90&&(!canClose||canClose())){el.style.transform="translateY(110%)";setTimeout(()=>{el.style.transform="";el.style.transition="";onClose();},230);}else el.style.transform="";y0=null;});}
+dragClose($("result"),()=>$("result").classList.remove("show"));
+dragClose($("sheet"),()=>{if(!$("celeGo"))$("scrim").hidden=true;},()=>!$("sheet").dataset.lock&&!$("celeGo"));
+/* settings */
+function voiceHelp(){const ios=/iPhone|iPad|iPod/.test(navigator.userAgent);
+  return "<p class='install' style='margin-top:6px'><b>For the most natural voice:</b> "+(ios
+    ?"iPhone: Settings → Accessibility → Spoken Content → Voices. If Kannada is listed, download it, then reopen the app."
+    :"Android: Settings → search <b>Text-to-speech</b> → Preferred engine: <b>Speech Services by Google</b> → ⚙ → Install voice data → <b>Kannada (India)</b>. Then reopen the app.")+"</p>";}
+function voiceHint(){if(kvoice||prog.voiceTip)return;prog.voiceTip=1;saveProg();
+  $("sheet").className="sheet";$("sheet").innerHTML="<h2>A more natural voice</h2><p>Right now the app uses a basic voice. Your phone can speak Kannada much more naturally with a free voice from your phone maker.</p>"+voiceHelp()+"<button class='go' id='vOk'>Got it</button>";
+  $("scrim").hidden=false;$("vOk").onclick=()=>{$("scrim").hidden=true;};}
+function openSettings(){
+  $("sheet").className="sheet";
+  $("sheet").innerHTML="<h2>Settings</h2>"
+    +"<div class='set-row'>Sounds<button class='switch"+(prog.sfx?" on":"")+"' id='swS' aria-label='Sounds'></button></div>"
+    +"<div class='set-row'>Vibration<button class='switch"+(prog.vib?" on":"")+"' id='swV' aria-label='Vibration'></button></div>"
+    +"<div class='sec'>Daily goal</div><div class='goals' id='sGoals'>"+[[3,"Easy"],[5,"Steady"],[10,"Serious"]].map(([g,l])=>"<button data-g='"+g+"' aria-pressed='"+(prog.goal===g)+"'>"+g+"<small>"+l+"</small></button>").join("")+"</div>"
+    +"<div class='sec'>Voice</div><p style='margin-top:4px'>"+(kvoice?"Using <b style='color:var(--ink)'>"+esc(kvoice.name)+"</b> from your phone.":"Your phone has no Kannada voice yet, so a basic built-in voice is used.")+"</p>"+voiceHelp()+"<div class='set-row' style='margin-top:10px'>Total XP<b>"+(prog.xp||0)+" XP</b></div>"
+    +"<div class='set-row'><button class='danger' id='sReset'>Reset all progress</button></div>"
+    +"<button class='go' id='sDone'>Done</button>";
+  $("scrim").hidden=false;
+  $("swS").onclick=()=>{prog.sfx=!prog.sfx;saveProg();$("swS").classList.toggle("on",prog.sfx);sfx("good");};
+  $("swV").onclick=()=>{prog.vib=!prog.vib;saveProg();$("swV").classList.toggle("on",prog.vib);haptic(30);};
+  $("sGoals").onclick=e=>{const b=e.target.closest("button");if(!b)return;prog.goal=+b.dataset.g;saveProg();[...$("sGoals").children].forEach(x=>x.setAttribute("aria-pressed",x===b));renderStreak();checkGoal();};
+  $("sReset").onclick=()=>{if(confirm("Reset all progress, streak, XP and saved phrases on this phone?")){try{localStorage.removeItem(PKEY);}catch(e){}location.reload();}};
+  $("sDone").onclick=()=>{$("scrim").hidden=true;};
+}
+$("gearBtn").onclick=openSettings;
+$("xpPill").onclick=()=>toast((prog.xp||0)+" XP earned. +10 for each new phrase, +50 for each unit test.");
+/* onboarding (first open only) */
+function onboarding(){
+  if(prog.onb)return;
+  const o=document.createElement("div");o.className="onb";o.innerHTML="<div class='onb-track' id='onbT'>"
+    +"<div class='onb-slide'><div class='icirc'>"+I("chat",54)+"</div><h2>Kannada for real life</h2><p>Phrases you'll actually use in Bengaluru — autos, shops, food, neighbours.</p></div>"
+    +"<div class='onb-slide'><div class='icirc'>"+I("ear",54)+"</div><h2>Listen. Say it. Get scored.</h2><p>Tap Play, then Say it. Your phone checks how you sounded. Say it right to unlock the next phrase.</p></div>"
+    +"<div class='onb-slide'><div class='icirc' style='color:#C2553F'>"+I("heart",54)+"</div><h2>Make it yours</h2><p>Double-tap a phrase to save it. Swipe the card for the next one. Swipe up for your path.</p></div>"
+    +"<div class='onb-slide'><div class='icirc'>"+I("target",54)+"</div><h2>Pick a daily goal</h2><p>Phrases to say correctly each day, plus 3 new words.</p><div class='goals' id='onbG'>"
+      +[[3,"Easy"],[5,"Steady"],[10,"Serious"]].map(([g,l])=>"<button data-g='"+g+"' aria-pressed='"+(prog.goal===g)+"'>"+g+"<small>"+l+"</small></button>").join("")+"</div></div>"
+    +"</div><div class='onb-foot'><div class='onb-dots' id='onbD'><i class='on'></i><i></i><i></i><i></i></div><button class='go' id='onbNext'>Next</button></div>";
+  document.body.appendChild(o);
+  const T=$("onbT"),N=4;let cur=0;
+  const sync=()=>{cur=Math.round(T.scrollLeft/T.clientWidth);[...$("onbD").children].forEach((d,k)=>d.classList.toggle("on",k===cur));$("onbNext").textContent=cur===N-1?"Let's go!":"Next";};
+  T.addEventListener("scroll",()=>requestAnimationFrame(sync),{passive:true});
+  $("onbG").onclick=e=>{const b=e.target.closest("button");if(!b)return;prog.goal=+b.dataset.g;[...$("onbG").children].forEach(x=>x.setAttribute("aria-pressed",x===b));sfx("tap");haptic();};
+  $("onbNext").onclick=()=>{haptic();if(cur<N-1){T.scrollTo({left:(cur+1)*T.clientWidth,behavior:"smooth"});return;}
+    prog.onb=true;saveProg();renderStreak();o.style.transition="opacity .35s";o.style.opacity="0";setTimeout(()=>o.remove(),360);sfx("great");};
+}
+
+/* ============ PAGES ============ */
+const PAGES=[...document.querySelectorAll(".pg")];
+function goPage(id){const el=$(id);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});}
+PAGES.forEach(pg=>{const b=document.createElement("button");b.setAttribute("aria-label",pg.dataset.name);b.onclick=()=>goPage(pg.id);$("dots").appendChild(b);});
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>goPage(b.dataset.go));
+if("IntersectionObserver"in window){const po=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const n=PAGES.indexOf(e.target);
+  [...$("dots").children].forEach((d,k)=>d.classList.toggle("on",k===n));if(e.target.id!=="pgLearn")stopAll();}}),{threshold:.55});PAGES.forEach(x=>po.observe(x));}
+function setDockH(){const d=document.querySelector(".pg-learn .dock");if(d)document.documentElement.style.setProperty("--dockh",(d.offsetHeight+6)+"px");}
+window.addEventListener("resize",setDockH);setTimeout(setDockH,300);
+$("rclose").onclick=()=>$("result").classList.remove("show");
+function renderHome(){
+  const h=new Date().getHours(),d=daily(),tw=todayWords(),wd=tw.filter(w=>d.w.includes(w.t)).length,n=streakCount();
+  $("hello").textContent=h<12?"ಶುಭೋದಯ! Good morning":h<17?"ನಮಸ್ಕಾರ! Good afternoon":"ಶುಭ ಸಂಜೆ! Good evening";
+  $("heroTitle").textContent=prog.goalDays.includes(today())?"Today's target done. Keep the streak alive tomorrow!":n?"Keep your "+n+"-day streak going.":"Ready to speak some Kannada?";
+  $("hsPh").textContent=Math.min(d.c.length,prog.goal)+"/"+prog.goal;$("hsW").textContent=wd+"/"+tw.length;
+  const U=currentUnit(UNITS.filter(unitOpen).pop().lvl),ph=PHRASES.filter(p=>p.lvl===U.lvl&&p.topic===U.topic),done=ph.filter(p=>isClear(keyOf(p))).length;
+  $("contSub").textContent=done?"Continue · "+done+"/"+ph.length+" phrases":"Start";
+  $("contTitle").textContent="Unit "+(U.n+1)+" · "+U.topic;
+  $("continueBtn").onclick=()=>{prog.lvl=U.lvl;prog.topic=U.topic;saveProg();build();goPage("pgLearn");};
+  $("learnSub").textContent=prog.topic==="__words"?"Today's new words":"Unit "+((list[0]&&unitOf(list[0])||U).n+1);
+  if(!$("homeFact").dataset.set){$("homeFact").dataset.set=1;$("homeFact").innerHTML="<b>Did you know?</b>"+FACTS[(new Date().getDate())%FACTS.length];}
+}
+
+
 /* ============ START ============ */
 if(!prog.lvl)prog.lvl=1;
-build();renderStreak();revealAll(document);
+build();renderStreak();revealAll(document);renderHome();renderSaved();setTimeout(onboarding,950);
 setTimeout(()=>{const sp=$("splash");sp.classList.add("gone");setTimeout(()=>sp.remove(),500);},900);
 setInterval(()=>{if(prog.daily.d&&prog.daily.d!==today()){renderStreak();build();}},60000);
 </script>
