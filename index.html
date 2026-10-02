@@ -715,9 +715,9 @@ const DSP=(function(){
     return prev[m]/(n+m);}
   /* distance → 0..1 score (calibrated on matched vs. mismatched phrases) */
   const LO=2.03,HI=3.1;
-  function score(refPCM,youPCM){const a=mfcc(refPCM),b=mfcc(youPCM);if(a.length<8||b.length<8)return null;
+  function score(refPCM,youPCM,lo,hi){lo=lo||LO;hi=hi||HI;const a=mfcc(refPCM),b=mfcc(youPCM);if(a.length<8||b.length<8)return null;
     const r=b.length/a.length;const lenPen=r<0.45||r>2.4?0.6:r<0.6||r>1.8?0.85:1;
-    const d=dtw(a,b);const s=Math.min(1,Math.max(0,(HI-d)/(HI-LO)));return {score:s*lenPen,dist:d,ratio:r};}
+    const d=dtw(a,b);const s=Math.min(1,Math.max(0,(hi-d)/(hi-lo)));return {score:s*lenPen,dist:d,ratio:r};}
   return {SR,mfcc,dtw,score};
 })();
 
@@ -1213,7 +1213,7 @@ const canRec=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&win
 const MIMES=["audio/mp4;codecs=mp4a.40.2","audio/mp4","audio/webm;codecs=opus","audio/webm","audio/ogg"];
 const pickMime=()=>window.MediaRecorder?MIMES.find(t=>{try{return MediaRecorder.isTypeSupported(t)}catch(e){return false}}):null;
 
-let mine=null,mineURL=null,live=null,srBroken=false;
+let mine=null,mineURL=null,live=null,srBroken=false,srMiss=0;
 /* explain why the microphone isn't available, and how to fix it */
 function micHelp(why){
   const insecure=location.protocol!=="https:"&&!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)||!window.isSecureContext||!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
@@ -1244,20 +1244,22 @@ function micHelp(why){
 async function startAttempt(){
   stopAll();
   const p=list[i],target=p.t;
-  let stream=null,mr=null,chunks=[],heardAlts=null,srObj=null;
-  if(!canRec){micHelp("blocked");return;}
-  {
+  let stream=null,mr=null,chunks=[],heardAlts=null,srObj=null,srErr=null;
+  const useSR=!!SR&&!srBroken&&!hasVoice(target);
+  if(!useSR&&!canRec){micHelp("blocked");return;}
+  if(!useSR){
     try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});}
     catch(e){micHelp(e&&e.name);return;}
     const m=pickMime();try{mr=new MediaRecorder(stream,m?{mimeType:m}:{});}catch(e){mr=new MediaRecorder(stream);}
     mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};
     mr.start();
   }
-  if(SR){
+  if(useSR){
     try{srObj=new SR();srObj.lang="kn-IN";srObj.interimResults=false;srObj.maxAlternatives=6;
       srObj.onresult=e=>{heardAlts=[...e.results[0]].map(r=>r.transcript);};
       srObj.onend=()=>{if(live)finish();};
-      srObj.onerror=e=>{if(["network","not-allowed","service-not-allowed","language-not-supported","audio-capture"].includes(e.error))srBroken=true;};
+      srObj.onerror=e=>{if(e.error==="not-allowed"||e.error==="service-not-allowed"){srErr=e.error;}
+        if(["network","not-allowed","service-not-allowed","language-not-supported","audio-capture"].includes(e.error))srBroken=true;};
       srObj.start();}catch(e){srObj=null;}
   }
   if(!mr&&!srObj){mine=null;showResult(target,null);return;}
@@ -1271,9 +1273,11 @@ async function startAttempt(){
     if(mr&&mr.state==="recording"){await new Promise(r=>{mr.onstop=r;mr.stop();});}
     if(stream)stream.getTracks().forEach(t=>t.stop());
     if(srObj&&!heardAlts)await new Promise(r=>setTimeout(r,700));
+    if(useSR){if(heardAlts)srMiss=0;else if(++srMiss>=2)srBroken=true;}
+    if(useSR&&!heardAlts&&srBroken){if(srErr&&!canRec){micHelp("NotAllowedError");return;}toast("Switching to recording check — tap Say it again.",3200);}
     if(chunks.length){mine=new Blob(chunks,{type:(mr&&mr.mimeType)||"audio/webm"});if(mineURL)URL.revokeObjectURL(mineURL);mineURL=URL.createObjectURL(mine);}
     else mine=null;
-    const ac=await acoustic(target);
+    const ac=useSR?null:await acoustic(target);
     showResult(target,heardAlts,ac);
   }
   live={finish};
@@ -1309,12 +1313,12 @@ async function toPCM(src){
   return y;
 }
 async function acoustic(k){
-  if(!mine)return null;const ref=clipURL(k);if(!ref)return null;
+  if(!mine)return null;const nat=clipURL(k),ref=nat||VD.computer[k];if(!ref)return null;const approx=!nat;
   try{
     let r=refCache.get(ref);if(!r){r=await toPCM(ref);refCache.set(ref,r);}
     const y=await toPCM(mine);let e=0;for(let n=0;n<y.length;n++)e+=y[n]*y[n];
     if(e/Math.max(1,y.length)<2e-7)return {silent:true};
-    return DSP.score(r,y);
+    const o=approx?DSP.score(r,y,2.45,3.25):DSP.score(r,y);if(o)o.approx=approx;return o;
   }catch(e){return null;}
 }
 function showResult(target,alts,ac){
@@ -1324,7 +1328,7 @@ function showResult(target,alts,ac){
   const hasText=!!(alts&&alts.length);
   const acScore=ac&&typeof ac.score==="number"?ac.score:null;
   const scoring=hasText||acScore!==null;
-  const selfMode=!scoring&&!(ac&&ac.silent)&&(!!mine||!SR||srBroken||FILE_MODE);
+  const selfMode=!scoring&&!(ac&&ac.silent)&&!!mine&&!hasVoice(k)&&!VD.computer[k];
   if(scoring){
     let heard=hasText?alts[0]:"",tScore=0;
     if(hasText)alts.forEach(a=>{const s=sim(a,target);if(s>tScore){tScore=s;heard=a;}});
@@ -1335,7 +1339,7 @@ function showResult(target,alts,ac){
     const pct=Math.round(score*100);$("pct").textContent=pct+"%";
     const arc=$("arc");arc.style.transition="stroke-dashoffset .7s";arc.style.strokeDashoffset=151-151*score;
     arc.setAttribute("stroke",score>=TH?"var(--leaf)":score>=0.5?"var(--amber)":"var(--flag)");
-    const how=acScore!==null&&acScore>=tScore?" Compared with the native recording.":"";
+    const how=acScore!==null&&acScore>=tScore?(ac.approx?" Rough check against the computer voice.":" Compared with the native recording."):hasText?" Checked by speech recognition.":"";
     $("verdict").innerHTML=score>=0.9?"ಸೂಪರ್! Crystal clear.<small>Anyone in Bengaluru would get that first time."+how+"</small>"
       :score>=TH?"ಚೆನ್ನಾಗಿದೆ — you'd be understood.<small>Small slips only."+how+"</small>"
       :score>=0.5?"Almost.<small>"+(hasText?"Some words landed. Look at the red ones, then try again.":"Close. Listen once more and match the rhythm.")+how+"</small>"
