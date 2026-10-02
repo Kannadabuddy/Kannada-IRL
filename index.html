@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
 <meta name="theme-color" content="#EEF3DC">
 <title>Kannaad IRL</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -400,6 +403,29 @@ button:active{transform:scale(.96)}
 .favbtn.on{color:#C2553F}
 .streak .ic{color:#C9772E}
 .combo .ic{vertical-align:-2px}
+
+/* ===== app shell: fixed screens + bottom tab bar ===== */
+html{scroll-snap-type:none!important;scroll-behavior:auto!important;height:100%;overflow:hidden}
+body{height:100%;overflow:hidden;position:fixed;inset:0;width:100%;overscroll-behavior:none;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+:root{--tabh:calc(62px + env(safe-area-inset-bottom,0px))}
+.pages{position:fixed;left:0;right:0;top:0;bottom:var(--tabh);overflow:hidden}
+.pg{position:absolute!important;inset:0;min-height:0!important;height:auto!important;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  padding-top:env(safe-area-inset-top,0px);opacity:0;visibility:hidden;transform:translateX(18px);transition:opacity .28s ease,transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s .32s;scroll-snap-align:none}
+.pg.active{opacity:1;visibility:visible;transform:none;transition:opacity .28s ease,transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s}
+.pg.back{transform:translateX(-18px)}
+.pg-learn{overflow:hidden!important}
+.nextpg{display:none!important}
+.dots{display:none}
+.tabbar{position:fixed;left:0;right:0;bottom:0;height:var(--tabh);padding-bottom:env(safe-area-inset-bottom,0px);z-index:15;display:grid;grid-template-columns:repeat(4,1fr);
+  background:rgba(255,255,255,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+.tabbar button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11.5px;font-weight:600;color:var(--soft);position:relative}
+.tabbar button.on{color:var(--leaf)}
+.tabbar button.on:before{content:"";position:absolute;top:0;width:28px;height:3px;border-radius:0 0 3px 3px;background:var(--leaf)}
+.tabbar button:active{transform:scale(.92)}
+.pg-learn .dock{border-top:1px solid var(--line);padding-bottom:10px}
+.toast{bottom:calc(var(--tabh) + 150px)}
+input,textarea{-webkit-user-select:text;user-select:text}
+.installbtn{margin-top:12px;width:100%;display:flex;align-items:center;gap:10px;justify-content:center;padding:12px;border-radius:16px;border:1.5px dashed var(--leaf);color:var(--leaf);font-weight:700;font-size:15px;background:transparent}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.ucard,.reveal-up{opacity:1;transform:none}}
 </style>
 </head>
@@ -428,6 +454,7 @@ button:active{transform:scale(.96)}
     </div>
     <button class="cta" id="continueBtn"><span><small id="contSub">Continue</small><b id="contTitle">Unit 1 · Getting by</b></span><i>›</i></button>
     <div class="fact reveal-up" id="homeFact"></div>
+    <button class="installbtn" id="installBtn" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Install Kannaad IRL on your phone</button>
   </div>
   </div>
   <button class="nextpg" data-go="pgLearn">Swipe up to practise <span>⌄</span></button>
@@ -514,11 +541,16 @@ button:active{transform:scale(.96)}
 <section class="pg pg-path" id="pgPath" data-name="Path">
   <div class="wrap">
   <section class="path" id="path"><h2>Your path</h2><p>Scroll to see what's ahead. Finish a unit and pass its test to open the next.</p><div id="pathList"></div></section>
-  <p style="text-align:center;font-size:12px;color:var(--soft);margin:22px 0 30px">Kannaad IRL · version 11</p>
+  <p style="text-align:center;font-size:12px;color:var(--soft);margin:22px 0 30px">Kannaad IRL · version 12</p>
   </div>
 </section>
 </main>
-<nav class="dots" id="dots" aria-label="Pages"></nav>
+<nav class="tabbar" id="tabbar" aria-label="Main">
+  <button data-tab="pgHome" class="on"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z"/></svg><span>Home</span></button>
+  <button data-tab="pgLearn"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Practice</span></button>
+  <button data-tab="pgWords"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg><span>Today</span></button>
+  <button data-tab="pgPath"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6z"/><path d="M9 4v14M15 6v14"/></svg><span>Path</span></button>
+</nav>
 
 <div class="toast" id="toast" role="status"></div>
 
@@ -1927,12 +1959,16 @@ function onboarding(){
 }
 
 /* ============ PAGES ============ */
-const PAGES=[...document.querySelectorAll(".pg")];
-function goPage(id){const el=$(id);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});}
-PAGES.forEach(pg=>{const b=document.createElement("button");b.setAttribute("aria-label",pg.dataset.name);b.onclick=()=>goPage(pg.id);$("dots").appendChild(b);});
+const PAGES=[...document.querySelectorAll(".pg")];let curPage="pgHome";
+function goPage(id){if(!$(id))return;const from=PAGES.findIndex(x=>x.id===curPage),to=PAGES.findIndex(x=>x.id===id);
+  PAGES.forEach((pg,k)=>{pg.classList.toggle("active",pg.id===id);pg.classList.toggle("back",k<to);});
+  [...$("tabbar").children].forEach(b=>b.classList.toggle("on",b.dataset.tab===id));
+  if(id!=="pgLearn")stopAll();if(id!==curPage){$(id).scrollTop=0;haptic(8);}curPage=id;
+  if(id==="pgLearn")setTimeout(setDockH,50);
+  if(id==="pgPath"||id==="pgWords")setTimeout(()=>revealAll($(id)),60);}
+$("tabbar").onclick=e=>{const b=e.target.closest("button[data-tab]");if(b)goPage(b.dataset.tab);};
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>goPage(b.dataset.go));
-if("IntersectionObserver"in window){const po=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const n=PAGES.indexOf(e.target);
-  [...$("dots").children].forEach((d,k)=>d.classList.toggle("on",k===n));if(e.target.id!=="pgLearn")stopAll();}}),{threshold:.55});PAGES.forEach(x=>po.observe(x));}
+PAGES[0].classList.add("active");
 function setDockH(){const d=document.querySelector(".pg-learn .dock");if(d)document.documentElement.style.setProperty("--dockh",(d.offsetHeight+6)+"px");}
 window.addEventListener("resize",setDockH);setTimeout(setDockH,300);
 $("rclose").onclick=()=>$("result").classList.remove("show");
@@ -1950,6 +1986,18 @@ function renderHome(){
 }
 
 
+/* ============ INSTALL AS AN APP ============ */
+const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+let installEvt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;if(!standalone)$("installBtn").hidden=false;});
+if(!standalone&&/iPhone|iPad|iPod/.test(navigator.userAgent)&&location.protocol==="https:")$("installBtn").hidden=false;
+$("installBtn").onclick=async()=>{
+  if(installEvt){installEvt.prompt();const r=await installEvt.userChoice.catch(()=>null);installEvt=null;if(r&&r.outcome==="accepted")$("installBtn").hidden=true;return;}
+  $("sheet").className="sheet";$("sheet").innerHTML="<h2>Install on your phone</h2><p>Kannaad IRL opens full screen like a normal app, with its own icon.</p>"
+    +"<p class='install'><b>iPhone (Safari):</b> tap the Share button at the bottom → <b>Add to Home Screen</b> → Add.<br><b>Android (Chrome):</b> tap ⋮ → <b>Install app</b> or <b>Add to Home screen</b>.</p><button class='go' id='insOk'>Got it</button>";
+  $("scrim").hidden=false;$("insOk").onclick=()=>{$("scrim").hidden=true;};};
+window.addEventListener("appinstalled",()=>{$("installBtn").hidden=true;toast("Installed. Open Kannaad IRL from your home screen.");});
+if("serviceWorker"in navigator&&location.protocol==="https:"&&!IN_CLAUDE){navigator.serviceWorker.register("sw.js").catch(()=>{});}
 /* ============ START ============ */
 if(!prog.lvl)prog.lvl=1;
 build();renderStreak();revealAll(document);renderHome();renderSaved();setTimeout(onboarding,950);
