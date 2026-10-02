@@ -273,6 +273,7 @@ button:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
     </article>
   </div>
   <p class="swipe-hint" id="hint">Say it correctly to unlock the next phrase</p>
+  <button class="unlock" id="testBtn" hidden>📝 Take the unit test</button>
 
   <section class="result" id="result">
     <div class="scorerow" id="scorerow">
@@ -305,6 +306,7 @@ button:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
     <div class="bar y"><i id="dWBar"></i></div>
     <div class="wordrow" id="wordrow"></div>
   </section>
+  <p style="text-align:center;font-size:12px;color:var(--soft);margin-top:14px">Kannaad IRL · version 7</p>
 </div>
 
 <nav class="dock" aria-label="Practice controls">
@@ -963,8 +965,9 @@ function haptic(){try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}}
 
 /* ============ LEARNER PROGRESS (tiny, this phone only) ============ */
 const PKEY="kol-progress-v1";
-let prog={best:{},heard:{},days:[],lvl:1,topic:"All",goal:5,daily:{d:"",c:[],w:[]},goalDays:[],words:{},factN:0,done:{}};
+let prog={best:{},heard:{},days:[],lvl:1,topic:"All",goal:5,daily:{d:"",c:[],w:[]},goalDays:[],words:{},factN:0,done:{},passed:{}};
 try{const s=localStorage.getItem(PKEY);if(s)prog=Object.assign(prog,JSON.parse(s));}catch(e){}
+if(!prog.passed)prog.passed={};
 function saveProg(){try{localStorage.setItem(PKEY,JSON.stringify(prog));}catch(e){}}
 function today(){const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
 const TH=0.75;                        // score needed to unlock the next phrase
@@ -1006,12 +1009,60 @@ $("wordrow").onclick=e=>{const b=e.target.closest("button");if(!b)return;
   const n=list.findIndex(p=>p.t===b.dataset.w);if(n>=0){i=n;render();}
   window.scrollTo({top:0,behavior:"smooth"});};
 
+/* ---- unit tests ---- */
+let T=null;
+const shuffle=a=>{a=a.slice();for(let n=a.length-1;n>0;n--){const r=Math.floor(Math.random()*(n+1));[a[n],a[r]]=[a[r],a[n]];}return a;};
+function renderTestBtn(){
+  const b=$("testBtn");if(prog.topic==="__words"||!list.length){b.hidden=true;return;}
+  const U=unitOf(list[0]);const ready=U&&!prog.passed[U.id]&&list.every(p=>isClear(keyOf(p)));
+  b.hidden=!ready;if(ready){b.textContent="📝 Take the "+U.topic+" test";b.onclick=()=>startTest(U);}
+}
+function startTest(U){
+  stopAll();const pool=PHRASES.filter(p=>p.lvl===U.lvl&&p.topic===U.topic);
+  const qs=shuffle(pool).slice(0,Math.min(6,pool.length)).map((p,n)=>({p,kind:n%2?"pick":"hear"}));
+  T={U,qs,n:0,right:0};showQ();
+}
+function showQ(){
+  const q=T.qs[T.n],p=q.p,others=shuffle(PHRASES.filter(x=>x.lvl===p.lvl&&x.t!==p.t&&x.g!==p.g)).slice(0,3);
+  const opts=shuffle([p,...others]);
+  $("sheet").className="sheet";$("sheet").dataset.lock="1";
+  $("sheet").innerHTML="<p style='margin:0'>"+esc(T.U.topic)+" test · question "+(T.n+1)+" of "+T.qs.length+"</p>"
+    +"<div class='bar' style='margin-top:8px'><i style='width:"+(T.n/T.qs.length*100)+"%'></i></div>"
+    +(q.kind==="hear"?"<h2 style='margin-top:14px'>Listen. What does it mean?</h2><button class='go' id='tPlay' style='background:var(--play);color:var(--auto-ink)'>▶ Play the phrase</button>"
+      :"<h2 style='margin-top:14px'>How do you say: “"+esc(p.g)+"”?</h2>")
+    +"<div class='share-opts' id='tOpts'>"+opts.map((o,n)=>"<button data-n='"+n+"' style='justify-content:flex-start;text-align:left;flex-direction:column;align-items:flex-start'>"
+      +(q.kind==="hear"?esc(o.g):"<span lang='kn' style='font-size:19px'>"+esc(o.t)+"</span><small style='font-weight:500;color:var(--soft)'>"+esc(o.r)+"</small>")+"</button>").join("")+"</div>";
+  $("scrim").hidden=false;
+  if(q.kind==="hear"){$("tPlay").onclick=()=>speak(p.t,false);setTimeout(()=>speak(p.t,false),350);}
+  let answered=false;
+  $("tOpts").onclick=e=>{const b=e.target.closest("button[data-n]");if(!b||answered)return;answered=true;
+    const ok=opts[+b.dataset.n]===p;if(ok)T.right++;haptic();
+    [...$("tOpts").children].forEach((x,n)=>{if(opts[n]===p){x.style.background="var(--okbg)";x.style.borderColor="var(--leaf)";}
+      else if(x===b){x.style.background="var(--nobg)";x.style.borderColor="var(--flag)";}});
+    if(!ok&&q.kind==="pick")speak(p.t,false);
+    setTimeout(()=>{T.n++;if(T.n<T.qs.length)showQ();else endTest();},ok?850:1700);};
+}
+function endTest(){
+  const U=T.U,need=Math.ceil(T.qs.length*0.8),pass=T.right>=need;delete $("sheet").dataset.lock;
+  if(pass){
+    prog.passed[U.id]=1;saveProg();$("scrim").hidden=true;
+    const nx=UNITS[U.n+1],lvlDone=!nx||nx.lvl!==U.lvl,L=LEVELS.find(x=>x[0]===U.lvl),NL=nx&&LEVELS.find(x=>x[0]===nx.lvl);
+    celebrate({emoji:lvlDone?"🏆":"🎉",title:lvlDone?"Level complete: "+L[1]:"Test passed: "+T.right+"/"+T.qs.length,
+      body:lvlDone?(nx?"You passed every unit test in "+L[1]+". "+NL[1]+" is now open.":"You passed every unit in the app. ಅದ್ಭುತ!"):"Next unit unlocked: "+nx.topic+". ಚೆನ್ನಾಗಿದೆ!",
+      cta:nx?"Start "+nx.topic:"Keep practising",then:()=>{if(nx){prog.lvl=nx.lvl;prog.topic=nx.topic;saveProg();}build();}});
+  }else{
+    $("sheet").innerHTML="<h2>"+T.right+" / "+T.qs.length+" — almost</h2><p>You need "+need+" correct to pass. Listen to the phrases once more, then try again.</p>"
+      +"<button class='go' id='tAgain'>Try the test again</button><button class='go' id='tReview' style='background:var(--surface);color:var(--ink);border:1px solid var(--line);margin-top:10px'>Review the phrases</button>";
+    $("tAgain").onclick=()=>startTest(U);$("tReview").onclick=()=>{$("scrim").hidden=true;prog.topic=U.topic;saveProg();build();};
+  }
+  T=null;renderTestBtn&&list.length&&renderTestBtn();
+}
 /* ---- celebrations & facts ---- */
 const queue=[];
 function nextFact(){const f=FACTS[prog.factN%FACTS.length];prog.factN++;saveProg();return f;}
 function celebrate(o){queue.push(o);if($("scrim").hidden)showNext();}
 function showNext(){
-  const o=queue.shift();if(!o){$("scrim").hidden=true;return;}
+  const o=queue.shift();if(!o){if(!$("sheet").dataset.lock)$("scrim").hidden=true;return;}
   const colors=["#E3EBB4","#C6D38A","#5B8A3C","#9CC77A","#F2E7A6"];
   const conf=Array.from({length:26},(_,n)=>"<i style='left:"+(Math.random()*100)+"%;background:"+colors[n%5]+";animation-delay:"+(Math.random()*.5)+"s'></i>").join("");
   $("sheet").className="sheet celebrate";
@@ -1035,7 +1086,7 @@ function openToday(){
   $("todayGo").onclick=()=>{$("scrim").hidden=true;prog.topic="__words";saveProg();build();window.scrollTo({top:0,behavior:"smooth"});};
 }
 $("streak").onclick=openToday;
-$("scrim").onclick=e=>{if(e.target===$("scrim")&&!$("celeGo")){$("scrim").hidden=true;}};
+$("scrim").onclick=e=>{if(e.target===$("scrim")&&!$("celeGo")&&!$("sheet").dataset.lock){$("scrim").hidden=true;}};
 function checkGoal(){
   const d=daily(),words=todayWords();
   if(prog.goalDays.includes(today()))return;
@@ -1055,14 +1106,9 @@ function onClear(p){
     if(tw.every(w=>d.w.includes(w.t))&&!prog.done["words:"+today()]){prog.done["words:"+today()]=1;saveProg();
       celebrate({emoji:"📚",title:"New words learned",body:"You learned "+tw.length+" new words today.",cta:"Back to phrases",then:()=>{prog.topic="All";saveProg();build();}});}
   }else{
-    const unit=PHRASES.filter(q=>q.lvl===p.lvl&&q.topic===p.topic),uk="u:"+p.lvl+"|"+p.topic;
-    if(unit.every(q=>isClear(keyOf(q)))&&!prog.done[uk]){prog.done[uk]=1;saveProg();
-      const lvlAll=PHRASES.filter(q=>q.lvl===p.lvl),lk="l:"+p.lvl;
-      if(lvlAll.every(q=>isClear(keyOf(q)))&&!prog.done[lk]){prog.done[lk]=1;saveProg();
-        const nx=LEVELS.find(L=>L[0]===p.lvl+1);
-        celebrate({emoji:"🏆",title:"Level complete: "+LEVELS.find(L=>L[0]===p.lvl)[1],body:"Every phrase in this level, said correctly.",
-          cta:nx?"Start "+nx[1]:"Keep practising",then:()=>{if(nx){prog.lvl=nx[0];prog.topic="All";saveProg();build();}}});
-      }else celebrate({emoji:"🎉",title:"Unit complete: "+p.topic,body:"All "+unit.length+" phrases unlocked. ಚೆನ್ನಾಗಿದೆ!",cta:"Next phrase",then:()=>go(1)});
+    const unit=PHRASES.filter(q=>q.lvl===p.lvl&&q.topic===p.topic),uk="u:"+p.lvl+"|"+p.topic,U=unitOf(p);
+    if(unit.every(q=>isClear(keyOf(q)))&&!prog.done[uk]&&U&&!prog.passed[U.id]){prog.done[uk]=1;saveProg();
+      celebrate({emoji:"📝",title:"Unit done: "+p.topic,body:"All "+unit.length+" phrases said correctly. Pass a short test to unlock the next unit.",cta:"Start the test",then:()=>startTest(U)});
     }
   }
   checkGoal();renderStreak();
@@ -1117,23 +1163,33 @@ let list=[],i=0,revealed=false;
 LEVELS.forEach(([v,label,kn])=>{
   const b=document.createElement("button");b.dataset.v=v;
   b.innerHTML=label+"<small lang='kn'>"+kn+"</small>";
-  b.onclick=()=>{prog.lvl=v;prog.topic="All";saveProg();build();haptic();};
+  b.onclick=()=>{if(!levelOpen(v)){toast("Finish the unit tests in the level before to open this one.");haptic();return;}prog.lvl=v;prog.topic="All";saveProg();build();haptic();};
   $("levels").appendChild(b);
 });
+/* ============ UNITS: one open at a time, each ends with a test ============ */
+const UNITS=(()=>{const u=[];PHRASES.forEach(p=>{const id=p.lvl+"|"+p.topic;if(!u.find(x=>x.id===id))u.push({id,lvl:p.lvl,topic:p.topic});});u.forEach((x,n)=>x.n=n);return u;})();
+const unitOf=p=>UNITS.find(u=>u.lvl===p.lvl&&u.topic===p.topic);
+const unitOpen=u=>u.n===0||!!prog.passed[UNITS[u.n-1].id];
+const levelOpen=l=>{const f=UNITS.find(u=>u.lvl===l);return !!f&&unitOpen(f);};
+function currentUnit(l){const us=UNITS.filter(u=>u.lvl===l&&unitOpen(u));return us.find(u=>!prog.passed[u.id])||us[us.length-1]||UNITS[0];}
 function build(){
-  const inLvl=PHRASES.filter(p=>p.lvl===prog.lvl);
-  const topics=["All",...new Set(inLvl.map(p=>p.topic))];
-  if(!topics.includes(prog.topic)&&prog.topic!=="__words")prog.topic="All";
+  if(!levelOpen(prog.lvl))prog.lvl=currentUnit(UNITS.filter(unitOpen).pop().lvl).lvl;
+  const inLvl=PHRASES.filter(p=>p.lvl===prog.lvl),lvlUnits=UNITS.filter(u=>u.lvl===prog.lvl);
+  if(prog.topic!=="__words"){const u=lvlUnits.find(u=>u.topic===prog.topic);if(!u||!unitOpen(u))prog.topic=currentUnit(prog.lvl).topic;}
   $("topics").innerHTML="";
   {const tw=todayWords(),d=daily(),b=document.createElement("button");b.className="wordchip";
     b.textContent="★ New words "+tw.filter(w=>d.w.includes(w.t)).length+"/"+tw.length;
     b.setAttribute("aria-pressed",prog.topic==="__words");
     b.onclick=()=>{prog.topic="__words";saveProg();build();haptic();};$("topics").appendChild(b);}
-  topics.forEach(t=>{const b=document.createElement("button");b.textContent=t==="All"?"Everything":t;
-    b.setAttribute("aria-pressed",t===prog.topic);
-    b.onclick=()=>{prog.topic=t;saveProg();build();haptic();};$("topics").appendChild(b);});
-  [...$("levels").children].forEach(b=>b.setAttribute("aria-pressed",prog.topic!=="__words"&&+b.dataset.v===prog.lvl));
-  list=prog.topic==="__words"?todayWords():inLvl.filter(p=>prog.topic==="All"||p.topic===prog.topic);
+  lvlUnits.forEach(u=>{const b=document.createElement("button"),open=unitOpen(u),pass=!!prog.passed[u.id];
+    b.textContent=(open?"":"🔒 ")+u.topic+(pass?" ✓":"");
+    b.setAttribute("aria-pressed",u.topic===prog.topic);if(!open)b.style.opacity=".55";
+    b.onclick=()=>{if(!open){toast("Pass the "+UNITS[u.n-1].topic+" test to unlock this unit.");haptic();return;}
+      prog.topic=u.topic;saveProg();build();haptic();};$("topics").appendChild(b);});
+  [...$("levels").children].forEach(b=>{const v=+b.dataset.v,open=levelOpen(v);
+    b.setAttribute("aria-pressed",prog.topic!=="__words"&&v===prog.lvl);b.style.opacity=open?"":".5";
+    b.querySelector(".lk")&&b.querySelector(".lk").remove();if(!open)b.insertAdjacentHTML("afterbegin","<span class='lk'>🔒 </span>");});
+  list=prog.topic==="__words"?todayWords():inLvl.filter(p=>p.topic===prog.topic);
   // start at the first phrase not yet unlocked
   i=Math.max(0,list.findIndex(p=>!isClear(keyOf(p))));
   render();
@@ -1156,7 +1212,7 @@ function render(){
   $("note").innerHTML=p.n||"";$("note").hidden=!p.n;
   {const vl=voiceLabel(k);$("voicetag").hidden=!vl;$("voicetag").innerHTML="<i></i>"+vl;}
   $("result").classList.remove("show");
-  renderLock();renderProg();
+  renderLock();renderProg();renderTestBtn();
   // warm up the next clip so it plays instantly
   const nx=list[(i+1)%list.length];const u=nx&&clipURL(keyOf(nx));
   
